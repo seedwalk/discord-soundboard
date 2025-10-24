@@ -86,8 +86,10 @@ Accede al panel web en: **http://localhost:3000/admin**
 
 ## 🎯 Comandos
 
-### Comandos de texto:
+### Comandos del sistema:
 - `!iluminame` - Devuelve una frase épica aleatoria
+- `!help` - Muestra la lista de todos los comandos disponibles
+- `!stop` - Detiene la reproducción y desconecta el bot del canal de voz
 
 ### Comandos de audio (dinámicos):
 - `!byebye` - (Incluido por defecto) Reproduce byebye.mp3

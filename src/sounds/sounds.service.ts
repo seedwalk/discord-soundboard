@@ -5,6 +5,9 @@ import { existsSync } from 'fs';
 
 @Injectable()
 export class SoundsService {
+  // Comandos reservados que no se pueden usar como sonidos
+  private readonly RESERVED_COMMANDS = ['!stop', '!help', '!iluminame'];
+
   constructor(private soundsRepository: SoundsRepository) {}
 
   async getAllSounds(): Promise<Sound[]> {
@@ -23,6 +26,11 @@ export class SoundsService {
     // Verificar que el comando empiece con !
     if (!command.startsWith('!')) {
       throw new Error('El comando debe empezar con !');
+    }
+
+    // Verificar que el comando no esté reservado
+    if (this.RESERVED_COMMANDS.includes(command.toLowerCase())) {
+      throw new Error(`El comando ${command} está reservado y no se puede usar`);
     }
 
     // Verificar que el archivo existe

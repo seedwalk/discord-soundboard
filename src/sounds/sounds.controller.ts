@@ -164,7 +164,7 @@ export class SoundsController {
 </head>
 <body>
   <div class="container">
-    <h1>🎵 Panel Admin - Trollbot</h1>
+    <h1>🎵 Panel Admin - Discord Soundboard</h1>
     
     <div class="card">
       <h2>➕ Agregar Nuevo Sonido</h2>

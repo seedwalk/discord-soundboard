@@ -14,6 +14,7 @@ import { SoundsService } from '../sounds/sounds.service';
 export class DiscordService implements OnModuleInit {
   private client: Client;
   private activeConnections: Map<string, any> = new Map(); // Guardamos las conexiones activas por servidor
+  private activePlayers: Map<string, any> = new Map(); // Guardamos los reproductores activos por servidor
 
   constructor(
     private configService: ConfigService,
@@ -68,6 +69,18 @@ export class DiscordService implements OnModuleInit {
       if ('send' in message.channel) {
         message.channel.send(fraseRandom);
       }
+      return;
+    }
+
+    // Si el mensaje es "!stop" (detener reproducción)
+    if (content === '!stop') {
+      await this.handleStopCommand(message);
+      return;
+    }
+
+    // Si el mensaje es "!help" (listar comandos)
+    if (content === '!help') {
+      await this.handleHelpCommand(message);
       return;
     }
 
@@ -130,24 +143,99 @@ export class DiscordService implements OnModuleInit {
       // 5. Crear el reproductor de audio
       const player = createAudioPlayer();
 
-      // 6. Cargar el archivo de audio desde el filepath proporcionado
+      // 6. Guardar el player activo para este servidor
+      this.activePlayers.set(guildId, player);
+
+      // 7. Cargar el archivo de audio desde el filepath proporcionado
       const resource = createAudioResource(audioFilePath);
 
-      // 7. Suscribir la conexión al reproductor
+      // 8. Suscribir la conexión al reproductor
       connection.subscribe(player);
 
-      // 8. Reproducir el audio
+      // 9. Reproducir el audio
       player.play(resource);
 
       console.log(`🎵 Reproduciendo: ${audioFilePath}`);
 
-      // 9. Cuando termine el audio, solo loguearlo (NO desconectar)
+      // 10. Cuando termine el audio, solo loguearlo (NO desconectar)
       player.on(AudioPlayerStatus.Idle, () => {
         console.log('✅ Audio reproducido. Bot sigue conectado al canal de voz.');
       });
 
     } catch (error) {
       console.error('❌ Error al reproducir audio:', error);
+    }
+  }
+
+  private async handleStopCommand(message: Message) {
+    try {
+      // Verificar que el mensaje viene de un servidor
+      if (!message.guild) {
+        return;
+      }
+
+      const guildId = message.guild.id;
+      const connection = this.activeConnections.get(guildId);
+      const player = this.activePlayers.get(guildId);
+
+      // Si no hay conexión activa, no hacer nada
+      if (!connection) {
+        return;
+      }
+
+      // Si hay un player activo, detenerlo
+      if (player) {
+        player.stop();
+        this.activePlayers.delete(guildId);
+        console.log('⏹️ Reproducción detenida');
+      }
+
+      // Desconectar el bot del canal de voz
+      connection.destroy();
+      this.activeConnections.delete(guildId);
+
+      console.log('✅ Bot desconectado del canal de voz');
+    } catch (error) {
+      console.error('❌ Error al detener reproducción:', error);
+    }
+  }
+
+  private async handleHelpCommand(message: Message) {
+    try {
+      // Obtener todos los sonidos de la base de datos
+      const sounds = await this.soundsService.getAllSounds();
+
+      // Crear la lista de comandos
+      let commandList = '🎵 **Comandos disponibles:**\n\n';
+      
+      // Comandos especiales
+      commandList += '**📋 Comandos del sistema:**\n';
+      commandList += '• `!iluminame` - Frase épica aleatoria\n';
+      commandList += '• `!help` - Muestra esta lista\n';
+      commandList += '• `!stop` - Detiene la reproducción y desconecta el bot\n\n';
+      
+      // Comandos de audio
+      if (sounds.length > 0) {
+        commandList += '**🔊 Comandos de audio:**\n';
+        sounds.forEach(sound => {
+          commandList += `• \`${sound.command}\`\n`;
+        });
+      } else {
+        commandList += '**🔊 Comandos de audio:**\n';
+        commandList += '_No hay sonidos configurados todavía._\n';
+      }
+
+      commandList += `\n💡 Total: ${sounds.length} sonido(s) disponible(s)`;
+
+      // Enviar la lista
+      if ('send' in message.channel) {
+        message.channel.send(commandList);
+      }
+    } catch (error) {
+      console.error('❌ Error al listar comandos:', error);
+      if ('send' in message.channel) {
+        message.channel.send('❌ Error al obtener la lista de comandos.');
+      }
     }
   }
 }

@@ -20,11 +20,22 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.19.0",
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.7",
+    "@nestjs/typeorm": "^11.0.0",
+    "@snazzah/davey": "^0.1.7",
+    "@types/multer": "^2.0.0",
+    "discord.js": "^14.24.0",
+    "libsodium-wrappers": "^0.7.15",
+    "multer": "^2.0.2",
+    "opusscript": "^0.0.8",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.27"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -8,7 +8,7 @@ import {
   AudioPlayerStatus 
 } from '@discordjs/voice';
 import { FRASES_EPICAS } from './discord.constants';
-import { SoundsService } from './sounds/sounds.service';
+import { SoundsService } from '../sounds/sounds.service';
 
 @Injectable()
 export class DiscordService implements OnModuleInit {

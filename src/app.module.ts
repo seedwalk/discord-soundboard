@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { DiscordModule } from './discord.module';
+import { DiscordModule } from './discord/discord.module';
 import { SoundsModule } from './sounds/sounds.module';
 
 @Module({
